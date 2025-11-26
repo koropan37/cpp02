@@ -14,15 +14,14 @@ Fixed::Fixed(const Fixed &raw) {
 
 Fixed::Fixed(const int& raw) {
     std::cout << "Int constructor called" << std::endl;
-    const int scale = (1 << fixed_bit_);            // 256
+    const int scale = (1 << fixed_bit_);
     const int max_in = std::numeric_limits<int>::max() / scale;
     const int min_in = std::numeric_limits<int>::min() / scale;
 
-    // 乗算する前に範囲チェックする方式（long long 不要）
     if (raw > max_in) throw std::overflow_error("overflow");
     if (raw < min_in) throw std::overflow_error("underflow");
 
-    raw_ = raw * scale; // 安全に乗算できる
+    raw_ = raw * scale;
 }
 //(1 << fixed_bit_)fixed_bit_は8で8ビット分シフト == (256)
 //後に同じ値で割る
@@ -32,7 +31,7 @@ Fixed::Fixed(const float& raw) {
     const double scale = static_cast<double>(raw) * static_cast<double>(1 << fixed_bit_);
 
     if (scale != scale)
-        throw std::overflow_error("NaN");
+        throw std::runtime_error("NaN");
 
     const double max = static_cast<double>(std::numeric_limits<int>::max());
     const double min = static_cast<double>(std::numeric_limits<int>::min());
@@ -71,7 +70,6 @@ int Fixed::toInt(void) const {
 }
 
 std::ostream &operator<<(std::ostream& out, const Fixed& raw) {
-	out << raw.toFloat();
-	return out;
+	return out << raw.toFloat();
 }
 // << aのようなところで呼ばれる

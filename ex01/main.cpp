@@ -3,7 +3,6 @@
 #include <cstdlib>
 
 int main( void ) {
-    try {
         Fixed a;
         Fixed const b( 10 );
         Fixed const c( 42.42f );
@@ -17,7 +16,7 @@ int main( void ) {
         std::cout << "b is " << b.toInt() << " as integer" << std::endl;
         std::cout << "c is " << c.toInt() << " as integer" << std::endl;
         std::cout << "d is " << d.toInt() << " as integer" << std::endl;
-
+    try {
         Fixed const e( -10 );
         std::cout << "e is " << e << std::endl;
         std::cout << "e is " << e.toInt() << " as integer" << std::endl;
@@ -31,6 +30,6 @@ int main( void ) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 //coutのデフォルト表示は有効数字6桁

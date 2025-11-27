@@ -11,11 +11,14 @@ class Point {
 	Point();
 	Point(const float x, const float y);
 	Point(const Fixed& x, const Fixed& y);
-	Point(const Point& point);
-	Point operator=(const Point& point);
+	Point(const Point& p);
+	Point operator=(const Point& p);
 	~Point();
 
-	
+	const Fixed& getX()const ;
+	const Fixed& getY()const ;
 };
+
+bool bsp( Point const a, Point const b, Point const c, Point const p);
 
 #endif

@@ -5,7 +5,6 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic
 
 SRCS = \
 		main.cpp \
-		Fixed.hpp \
 		Fixed.cpp \
 		Point.cpp \
 		bsp.cpp

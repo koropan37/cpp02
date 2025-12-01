@@ -23,8 +23,6 @@ void printTitle(std::string const& title) {
 }
 
 // Print triangle with points A, B, C, and P.
-// This function is written with the help of Copilot.
-// https://copilot.github.com/
 void printTriangle(const Point a, const Point b, const Point c, const Point p) {
   // get min and max of x and y
   long minX = std::min(std::min(a.getX(), b.getX()), c.getX()).getRawBits();
@@ -93,18 +91,17 @@ void printTriangle(const Point a, const Point b, const Point c, const Point p) {
 void test(const std::string& info, const Point a, const Point b, const Point c,
           const Point p) {
   printTriangle(a, b, c, p);
-  std::cout << std::fixed;
-  std::cout  // std::setw(15)
-      << info << " : in " ;
-  std::cout.flush();
-  std::cout << (bsp(a, b, c, p) ? "\ttrue " : "\tfalse ") << std::endl;
+
+  bool res = bsp(a, b, c, p);
+
+  std::cout << std::fixed << std::setprecision(6);
+  std::cout << info << " : " << p << " in A:" << a <<" B:"<< b <<" C:" << c << "\n";
+  std::cout << " bsp=" << std::boolalpha << res << std::noboolalpha << "\n";
 }
 
-#define EPS 0.00390625f
 int main(void) {
   {
     Fixed a;
-    // setRawBits / getRawBits
     printTitle("setRawBits / getRawBits");
     std::cout << "a.setRawBits(-1): " << std::endl;
     a.setRawBits(-1);
@@ -134,22 +131,16 @@ int main(void) {
     test("|.>", Point(-0.125f, -0.125f), Point(0.125f, -0.125f),
          Point(0, 0.125f), p);
     test("/./", Point(-4242, -1), Point(0, 1), Point(4242, 0), p);
-  }
-  {
-    Point p;
 
-    printTitle("EPSILON TEST");
-    test("On the same line", Point(0, 0), Point(EPS, EPS),
-         Point(3 * EPS, 3 * EPS), Point(2 * EPS, 2 * EPS));
-    test("|._\\", Point(0, EPS), Point(0, 0), Point(EPS, 0), p);
-    test("/_._\\", Point(0, EPS), Point(-EPS, 0), Point(EPS, 0), p);
-    test(".\\|", Point(0, EPS), Point(EPS, EPS), Point(EPS, 0), p);
-    test(".//", Point(-EPS, -EPS), Point(EPS, EPS), Point(EPS, 0), p);
-
-    test("\\./", Point(EPS, EPS), Point(0, -EPS), Point(-EPS, EPS), p);
-    test("<.|", Point(EPS, EPS), Point(-EPS, 0), Point(EPS, -EPS), p);
-    test("|.>", Point(-EPS, -EPS), Point(EPS, -EPS), Point(0, EPS), p);
-    test("/./", Point(-4242, -EPS), Point(0, EPS), Point(4242, 0), p);
+    test("P at vertex A", Point(0,0), Point(5,0), Point(0,5), Point(0,0));
+    test("P on edge AB", Point(0,0), Point(5,0), Point(0,5), Point(2.5f, 0.0f));
+    test("P on edge BC", Point(0,0), Point(5,0), Point(0,5), Point(3.0f, 2.0f));
+    test("P on edge CA", Point(0,0), Point(5,0), Point(0,5), Point(0.0f, 2.0f));
+    test("Colinear triangle (degenerate)", Point(0,0), Point(1,1), Point(2,2), Point(1,1));
+    test("Two points equal (degenerate)", Point(0,0), Point(0,0), Point(1,0), Point(0,0));
+    test("Very small triangle (precision test)", Point(0.0f,0.0f), Point(0.0039f,0.0f), Point(0.0f,0.0039f), Point(0.001f,0.001f));
+    test("Large coords", Point(1000,1000), Point(2000,1000), Point(1000,2000), Point(1500,1500));
+    test("Outside near edge", Point(0,0), Point(5,0), Point(0,5), Point(2.6f, -0.1f));
   }
   return 0;
 }

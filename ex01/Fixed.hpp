@@ -9,6 +9,9 @@ class Fixed {
     int raw_;
     static const int fixed_bit_ = 8;
 
+    static void validateOverflow(long v);
+    static void validateOverflow(double v);
+
  public:
     Fixed();
 	Fixed(const int& raw);

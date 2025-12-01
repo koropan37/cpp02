@@ -10,18 +10,14 @@ Fixed::Fixed(const Fixed& raw) {
 }
 
 Fixed::Fixed(const int& raw) {
-    const int tmp = (1 << fixed_bit_);
-    const int max = std::numeric_limits<int>::max() / tmp;
-    const int min = std::numeric_limits<int>::min() / tmp;
+    long tmp = static_cast<long>(raw) * (1L << fixed_bit_);
 
-    if (raw > max) throw std::overflow_error("overflow");
-    if (raw < min) throw std::overflow_error("underflow");
-
-    raw_ = raw * tmp;
+    validateOverflow(tmp);
+    raw_ = static_cast<int>(tmp);
 }
 
 Fixed::Fixed(const float& raw) {
-    const double tmp = static_cast<double>(raw) * static_cast<double>(1 << fixed_bit_);
+    const double tmp = static_cast<double>(raw) * static_cast<double>(1L << fixed_bit_);
 
     if(tmp != tmp) throw std::runtime_error("NaN");
 
@@ -42,11 +38,11 @@ int Fixed::getRawBits(void) const { return raw_; }
 void Fixed::setRawBits(int const raw) { raw_ = raw; }
 
 float Fixed::toFloat(void) const {
-    return (static_cast<float>(getRawBits()) / static_cast<float>(1 << fixed_bit_));
+    return (static_cast<float>(getRawBits()) / static_cast<float>(1L << fixed_bit_));
 }
 
 int Fixed::toInt(void) const {
-    return (getRawBits() / (1 << fixed_bit_));
+    return (getRawBits() / (1L << fixed_bit_));
 }
 
 std::ostream &operator<<(std::ostream& out, const Fixed& raw) {

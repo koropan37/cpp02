@@ -27,50 +27,6 @@ int main() {
 
 // イプシロンは、1+x > 1 となる最小の x
 
-static void printResult(const char* label, const Fixed &res) {
-    std::cout << std::left << std::setw(16) << label << " : "
-              << std::fixed << std::setprecision(6) << res.toFloat() << std::endl;
-}
-
-static void testMul(const char* label, const Fixed &a, const Fixed &b) {
-    try {
-        Fixed r = a * b;
-        printResult(label, r);
-    } catch (const std::exception &e) {
-        std::cout << std::left << std::setw(16) << label << " : " << e.what() << std::endl;
-    }
-}
-
-static void testDiv(const char* label, const Fixed &a, const Fixed &b) {
-    try {
-        Fixed r = a / b;
-        printResult(label, r);
-    } catch (const std::exception &e) {
-        std::cout << std::left << std::setw(16) << label << " : " << e.what() << std::endl;
-    }
-}
-
-static const int SCALE = 1 << 8; // 256
-
-static int raw_int(int v) { return v * SCALE; }
-static int raw_float(float v) { return static_cast<int>(roundf(v * static_cast<float>(SCALE))); }
-
-static int mul_raw(int ra, int rb) {
-    double tmp = static_cast<double>(ra) * static_cast<double>(rb) / static_cast<double>(SCALE);
-    return static_cast<int>(roundf(static_cast<float>(tmp)));
-}
-
-static int div_raw(int ra, int rb) {
-    double tmp = static_cast<double>(ra) * static_cast<double>(SCALE) / static_cast<double>(rb);
-    return static_cast<int>(roundf(static_cast<float>(tmp)));
-}
-
-static void print_label(const char* label, int raw) {
-    double out = static_cast<double>(raw) / SCALE;
-    std::cout << std::left << std::setw(16) << label << " : "
-              << std::fixed << std::setprecision(6) << out << std::endl;
-}
-
 void printTitle(std::string const &title) {
   // set color to green
   std::cout << "\033[1;32m";
@@ -118,6 +74,7 @@ void testOperators() {
     std::cout << "a.toInt(): " << a.toInt() << std::endl;
     std::cout << "a.toFloat(): " << a.toFloat() << std::endl;
     std::cout << "a.getRawBits(): " << a.getRawBits() << std::endl;
+    // getRawBits()の返り値はintなのでFixedのoperator<<は呼ばれない
     // Comparison Operator
     printTitle("Comparison Operator");
     std::cout << "a < b " << std::endl;
@@ -187,6 +144,50 @@ void testOperators() {
     std::cout << "min( c, d )" << std::endl;
     std::cout << Fixed::min(c, d) << std::endl;
   }
+}
+
+static void printResult(const char* label, const Fixed &res) {
+    std::cout << std::left << std::setw(16) << label << " : "
+              << std::fixed << std::setprecision(6) << res.toFloat() << std::endl;
+}
+
+static void testMul(const char* label, const Fixed &a, const Fixed &b) {
+    try {
+        Fixed r = a * b;
+        printResult(label, r);
+    } catch (const std::exception &e) {
+        std::cout << std::left << std::setw(16) << label << " : " << e.what() << std::endl;
+    }
+}
+
+static void testDiv(const char* label, const Fixed &a, const Fixed &b) {
+    try {
+        Fixed r = a / b;
+        printResult(label, r);
+    } catch (const std::exception &e) {
+        std::cout << std::left << std::setw(16) << label << " : " << e.what() << std::endl;
+    }
+}
+
+static const int SCALE = 1 << 8; // 256
+
+static int raw_int(int v) { return v * SCALE; }
+static int raw_float(float v) { return static_cast<int>(roundf(v * static_cast<float>(SCALE))); }
+
+static int mul_raw(int ra, int rb) {
+    double tmp = static_cast<double>(ra) * static_cast<double>(rb) / static_cast<double>(SCALE);
+    return static_cast<int>(roundf(static_cast<float>(tmp)));
+}
+
+static int div_raw(int ra, int rb) {
+    double tmp = static_cast<double>(ra) * static_cast<double>(SCALE) / static_cast<double>(rb);
+    return static_cast<int>(roundf(static_cast<float>(tmp)));
+}
+
+static void print_label(const char* label, int raw) {
+    double out = static_cast<double>(raw) / SCALE;
+    std::cout << std::left << std::setw(16) << label << " : "
+              << std::fixed << std::setprecision(6) << out << std::endl;
 }
 
 static void testCalculate(void) {

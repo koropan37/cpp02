@@ -14,37 +14,26 @@ Fixed::Fixed(const Fixed &raw) {
 
 Fixed::Fixed(const int& raw) {
     std::cout << "Int constructor called" << std::endl;
-    const int scale = (1 << fixed_bit_);
-    const int max_in = std::numeric_limits<int>::max() / scale;
-    const int min_in = std::numeric_limits<int>::min() / scale;
+    long tmp = static_cast<long>(raw) * (1L << fixed_bit_);
 
-    if (raw > max_in) throw std::overflow_error("overflow");
-    if (raw < min_in) throw std::overflow_error("underflow");
-
-    raw_ = raw * scale;
+    validateOverflow(tmp);
+    raw_ = static_cast<int>(tmp);
 }
 //(1 << fixed_bit_)fixed_bit_は8で8ビット分シフト == (256)
 //後に同じ値で割る
 
 Fixed::Fixed(const float& raw) {
     std::cout << "Float constructor called" << std::endl;
-    const double scale = static_cast<double>(raw) * static_cast<double>(1 << fixed_bit_);
+    const double tmp = static_cast<double>(raw) * static_cast<double>(1L << fixed_bit_);
 
-    if (scale != scale)
-        throw std::runtime_error("NaN");
-
-    const double max = static_cast<double>(std::numeric_limits<int>::max());
-    const double min = static_cast<double>(std::numeric_limits<int>::min());
-
-    if (scale > max + 0.5) throw std::overflow_error("overflow");
-    if (scale < min - 0.5) throw std::overflow_error("underflow");
-
-    raw_ = static_cast<int>(roundf(scale));
+    if(tmp != tmp) throw std::runtime_error("NaN");
+	validateOverflow(tmp);
+    raw_ = static_cast<int>(roundf(static_cast<float>(tmp)));
 }
 
 //NaN(Not a number)0除算や型変換が失敗した場合に発生
 //NaN != NaNになる
-//roundfは最近接整数に丸めた値にする
+//roundfは四捨五入(負は0から遠ざける)
 //2.5->3.0, -2.5->3.0
 
 Fixed &Fixed::operator=(const Fixed& raw) {
@@ -73,3 +62,18 @@ std::ostream &operator<<(std::ostream& out, const Fixed& raw) {
 	return out << raw.toFloat();
 }
 // << aのようなところで呼ばれる
+
+void Fixed::validateOverflow(long v) {
+    const long max = static_cast<long>(std::numeric_limits<int>::max());
+    const long min = static_cast<long>(std::numeric_limits<int>::min());
+    if (v > max) throw std::overflow_error("overflow");
+    if (v < min) throw std::overflow_error("underflow");
+}
+
+void Fixed::validateOverflow(double v) {
+    const double max = static_cast<double>(std::numeric_limits<int>::max());
+    const double min = static_cast<double>(std::numeric_limits<int>::min());
+    if (v > max + 0.5) throw std::overflow_error("overflow");
+    if (v < min - 0.5) throw std::overflow_error("underflow");
+}
+//オーバーフローをオーバーライドでチェックするためにlong, doubleに変換

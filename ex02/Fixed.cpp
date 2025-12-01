@@ -5,28 +5,21 @@
 
 Fixed::Fixed(void) : raw_(0) {}
 
-Fixed::Fixed(const Fixed& raw) {
-    operator=(raw);
+Fixed::Fixed(const Fixed &raw) : raw_(raw.raw_) {
 }
 
 Fixed::Fixed(const int& raw) {
-    const int tmp = (1 << fixed_bit_);
-    const int max = std::numeric_limits<int>::max() / tmp;
-    const int min = std::numeric_limits<int>::min() / tmp;
+    long tmp = static_cast<long>(raw) * (1L << fixed_bit_);
 
-    if (raw > max) throw std::overflow_error("overflow");
-    if (raw < min) throw std::overflow_error("underflow");
-
-    raw_ = raw * tmp;
+    validateOverflow(tmp);
+    raw_ = static_cast<int>(tmp);
 }
 
 Fixed::Fixed(const float& raw) {
-    const double tmp = static_cast<double>(raw) * static_cast<double>(1 << fixed_bit_);
+    const double tmp = static_cast<double>(raw) * static_cast<double>(1L << fixed_bit_);
 
     if(tmp != tmp) throw std::runtime_error("NaN");
-
 	validateOverflow(tmp);
-
     raw_ = static_cast<int>(roundf(static_cast<float>(tmp)));
 }
 
@@ -42,7 +35,7 @@ int Fixed::getRawBits(void) const { return raw_; }
 void Fixed::setRawBits(int const raw) { raw_ = raw; }
 
 float Fixed::toFloat(void) const {
-    return (static_cast<float>(getRawBits()) / static_cast<float>(1 << fixed_bit_));
+    return (static_cast<float>(getRawBits()) / static_cast<float>(1L << fixed_bit_));
 }
 
 int Fixed::toInt(void) const {
@@ -105,9 +98,10 @@ Fixed Fixed::operator*(const Fixed& other)const {
     double tmp = \
 				  static_cast<double>(this->raw_) \
 				* static_cast<double>(other.raw_) \
-				/ static_cast<double>(1 << fixed_bit_);
+				/ static_cast<double>(1L << fixed_bit_);
 				//(1 << fixed_bit)を二乗してしまうので1回分割る
 	validateOverflow(tmp);
+
     Fixed res;
     res.setRawBits(static_cast<int>(roundf(static_cast<float>(tmp))));
     return res;
@@ -118,7 +112,7 @@ Fixed Fixed::operator/(const Fixed& other)const {
 	if(other.raw_ == 0) throw std::runtime_error("division by zero"); //0除算チェック
     double tmp = \
 				 (static_cast<double>(this->raw_) \
-				* static_cast<double>(1 << fixed_bit_)) \
+				* static_cast<double>(1L << fixed_bit_)) \
 				/ static_cast<double>(other.raw_);
 				//(1 << fixed_bit)を2回割ってしまうので1回分掛ける
 	validateOverflow(tmp);
@@ -129,7 +123,7 @@ Fixed Fixed::operator/(const Fixed& other)const {
 }
 
 Fixed& Fixed::operator++(void) { //前置(++i)
-	++raw_;
+	raw_++;
 	return *this;
 }
 
@@ -140,7 +134,7 @@ Fixed Fixed::operator++(int) { //後置(i++)
 }
 
 Fixed& Fixed::operator--(void) { //前置(--i)
-	--raw_;
+	raw_--;
 	return *this;
 }
 
